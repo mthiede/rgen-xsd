@@ -7,15 +7,8 @@ require "rtext/language"
 require "rtext/serializer"
 require 'mmgen/metamodel_generator'
 
-UseGenerated = ARGV.any?{|a| a == "--genmm"}
-ARGV.reject!{|a| a == "--genmm"}
-
-if UseGenerated
-  require "xml_schema_metamodel_generated"
-  XMLSchemaMetamodel = MM::W3Org2001XMLSchema
-else
-  require "xml_schema_metamodel_auto"
-end
+require "xml_schema_metamodel_generated"
+XMLSchemaMetamodel = MM::W3Org2001XMLSchema
 
 include RGen::Util::NameHelper
 

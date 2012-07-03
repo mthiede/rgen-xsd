@@ -2,6 +2,3 @@ task :default do
   sh "ruby -I../rgen/lib -I../rtext/lib read_xsd.rb XMLSchema.xsd.xml XMLSchemaDatatypes.xsd.xml xml_schema/xml.xsd"
 end
 
-task :genmm do
-  sh "ruby -I../rgen/lib -I../rtext/lib read_xsd.rb --genmm XMLSchema.xsd.xml XMLSchemaDatatypes.xsd.xml xml_schema/xml.xsd"
-end
