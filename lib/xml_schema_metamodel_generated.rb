@@ -13,7 +13,7 @@ module MM
       FormChoiceEnum = Enum.new(:name => 'FormChoiceEnum', :literals =>[ :qualified, :unqualified ])
       ModeEnum = Enum.new(:name => 'ModeEnum', :literals =>[ :none, :interleave, :suffix ])
       ProcessContentsEnum = Enum.new(:name => 'ProcessContentsEnum', :literals =>[ :skip, :lax, :strict ])
-      ModeEnum = Enum.new(:name => 'ModeEnum', :literals =>[ :interleave, :suffix ])
+      ModeEnum2 = Enum.new(:name => 'ModeEnum2', :literals =>[ :interleave, :suffix ])
    end
 
    module W3OrgXML1998Namespace
@@ -278,7 +278,7 @@ end
 
 class MM::W3Org2001XMLSchema::DefaultOpenContentTYPE < MM::W3Org2001XMLSchema::Annotated
    has_attr 'appliesToEmpty', Boolean 
-   has_attr 'mode', MM::W3Org2001XMLSchema::ModeEnum 
+   has_attr 'mode', MM::W3Org2001XMLSchema::ModeEnum2 
 end
 
 class MM::W3Org2001XMLSchema::NotationTYPE < MM::W3Org2001XMLSchema::Annotated

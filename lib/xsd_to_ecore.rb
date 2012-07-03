@@ -171,12 +171,23 @@ class XSDToEcoreTransformer < RGen::Transformer
   transform XMLSchemaMetamodel::SimpleType, :to => EEnum do
     _literals = build_type_desc(@current_object).type
     raise "not an enum: #{@current_object.class}" unless _literals.is_a?(Array)
-    { :name => name ? firstToUpper(name)+"Enum" : 
-        containingAttribute ? firstToUpper(containingAttribute.effectiveAttribute.name)+"Enum" :
-        "Unknown",
+    { :name => uniq_classifier_name(@package_by_source_element[@current_object], 
+        name ? firstToUpper(name)+"Enum" : 
+          containingAttribute ? firstToUpper(containingAttribute.effectiveAttribute.name)+"Enum" :
+          "Unknown"),
       :eLiterals => _literals.collect{|l| @env_out.new(RGen::ECore::EEnumLiteral, :name => l)},
       :ePackage => @package_by_source_element[@current_object]
     }
+  end
+
+  def uniq_classifier_name(package, base)
+    try = base
+    index = 2
+    while package.eClassifiers.any?{|c| c.name == try}
+      try = base + index.to_s
+      index += 1
+    end
+    try
   end
 
   def child_elements(element, opts={})
