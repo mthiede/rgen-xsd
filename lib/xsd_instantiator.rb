@@ -1,4 +1,4 @@
-require "xml_instantiator"
+require "xsi_instantiator"
 require "rgen/instantiator/reference_resolver"
 
 class XSDInstantiator
@@ -12,7 +12,7 @@ class XSDInstantiator
   end
 
   def instantiate(file_name)
-    inst = XMLInstantiator.new(@mm, @env)
+    inst = XSIInstantiator.new(@mm, @env)
     schema = inst.instantiate(file_name, 
       :root_class => XMLSchemaMetamodel::SchemaTYPE,
       :xml_name_provider => lambda do |o|
