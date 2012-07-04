@@ -34,6 +34,7 @@ class XSIInstantiator
     @env << element
     set_attribute_values(element, node)
     simple_content = ""
+    can_take_any = eclass.eAllAttributes.any?{|a| a.name == "anyObject"}
     node.children.each do |c|
       if c.text?
         simple_content << c.text
@@ -50,7 +51,16 @@ class XSIInstantiator
             puts "Line: #{node.line}: #{e}"
           end
         else
-          problem "could not determine reference for tag #{c.name}, #{feats.size} options", node
+          if can_take_any
+            begin
+              # currently the XML node is added to the model
+              element.setOrAddGeneric("anyObject", c)
+            rescue Exception => e
+              puts "Line: #{node.line}: #{e}"
+            end
+          else
+            problem "could not determine reference for tag #{c.name}, #{feats.size} options", node
+          end
         end
       end
     end

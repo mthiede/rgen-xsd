@@ -22,6 +22,7 @@ module MM
 end
 
 class MM::W3Org2001XMLSchema::AnyType < RGen::MetamodelBuilder::MMBase
+   has_many_attr 'anyObject', Object 
    has_attr 'text', String do
       annotation :source => "xsd", :details => {'simpleContent' => 'true'}
    end
@@ -39,6 +40,7 @@ class MM::W3Org2001XMLSchema::AnnotationTYPE < MM::W3Org2001XMLSchema::OpenAttrs
 end
 
 class MM::W3Org2001XMLSchema::AppinfoTYPE < RGen::MetamodelBuilder::MMBase
+   has_many_attr 'anyObject', Object 
    has_attr 'source', String 
    has_attr 'text', String do
       annotation :source => "xsd", :details => {'simpleContent' => 'true'}
@@ -46,6 +48,7 @@ class MM::W3Org2001XMLSchema::AppinfoTYPE < RGen::MetamodelBuilder::MMBase
 end
 
 class MM::W3Org2001XMLSchema::DocumentationTYPE < RGen::MetamodelBuilder::MMBase
+   has_many_attr 'anyObject', Object 
    has_attr 'source', String 
    has_attr 'lang', Object 
    has_attr 'text', String do

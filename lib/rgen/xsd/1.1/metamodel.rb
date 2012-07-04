@@ -24,6 +24,7 @@ module MM
 end
 
 class MM::W3Org2001XMLSchema::AnyType < RGen::MetamodelBuilder::MMBase
+   has_many_attr 'anyObject', Object 
    has_attr 'text', String do
       annotation :source => "xsd", :details => {'simpleContent' => 'true'}
    end
@@ -41,6 +42,7 @@ class MM::W3Org2001XMLSchema::AnnotationTYPE < MM::W3Org2001XMLSchema::OpenAttrs
 end
 
 class MM::W3Org2001XMLSchema::AppinfoTYPE < RGen::MetamodelBuilder::MMBase
+   has_many_attr 'anyObject', Object 
    has_attr 'source', String 
    has_attr 'text', String do
       annotation :source => "xsd", :details => {'simpleContent' => 'true'}
@@ -48,6 +50,7 @@ class MM::W3Org2001XMLSchema::AppinfoTYPE < RGen::MetamodelBuilder::MMBase
 end
 
 class MM::W3Org2001XMLSchema::DocumentationTYPE < RGen::MetamodelBuilder::MMBase
+   has_many_attr 'anyObject', Object 
    has_attr 'source', String 
    has_attr 'lang', Object 
    has_attr 'text', String do
@@ -78,6 +81,7 @@ class MM::W3Org2001XMLSchema::LocalSimpleType < MM::W3Org2001XMLSchema::SimpleTy
 end
 
 class MM::W3Org2001XMLSchema::RestrictionTYPE < MM::W3Org2001XMLSchema::Annotated
+   has_many_attr 'anyObject', Object 
 end
 
 class MM::W3Org2001XMLSchema::ListTYPE < MM::W3Org2001XMLSchema::Annotated
@@ -176,6 +180,7 @@ class MM::W3Org2001XMLSchema::ComplexContentTYPE < MM::W3Org2001XMLSchema::Annot
 end
 
 class MM::W3Org2001XMLSchema::RestrictionType < MM::W3Org2001XMLSchema::Annotated
+   has_many_attr 'anyObject', Object 
 end
 
 class MM::W3Org2001XMLSchema::SimpleRestrictionType < MM::W3Org2001XMLSchema::RestrictionType

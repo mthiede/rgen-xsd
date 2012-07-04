@@ -32,22 +32,27 @@ def add_substitution_particles(particles)
 end
 
 # flattens the particle tree with root +particle+ and calculates min/max occurrence
-# returns a list of Particles of kind "element"
+# returns a list of particles of kind "element" and "any"
 # element names are unique throughout the list
-# the element order is the order of first occurrence
+# the order is the order of first occurrence
 def flatten_particle_tree(particle)
-  if particle.kind == :element
+  if particle.kind == :element || particle.kind == :any
     [particle]
   else 
     eocc = {}
     elist = []
     particle.children.each do |c|
       flatten_particle_tree(c).each do |e|
-        if !eocc[e.node.name]
-          eocc[e.node.name] = [] 
-          elist << e.node.name
+        if e.kind == :element
+          name = e.node.name
+        else
+          name = "#any#" 
         end
-        eocc[e.node.name] << e
+        if !eocc[name]
+          eocc[name] = [] 
+          elist << name
+        end
+        eocc[name] << e
       end
     end
     is_unbounded = lambda do |particle, elements|
@@ -69,7 +74,11 @@ def flatten_particle_tree(particle)
         else
           max = eocc[n].collect{|e| e.maxOccurs.to_i}.max * particle.maxOccurs.to_i
         end
-        Particle.new(:element, [], min, max, eocc[n].first.node)
+        if n == "#any#"
+          Particle.new(:any, [], min, max, eocc[n].first.node)
+        else
+          Particle.new(:element, [], min, max, eocc[n].first.node)
+        end
       end
     else # sequence or all
       elist.collect do |n|
@@ -79,7 +88,11 @@ def flatten_particle_tree(particle)
         else
           max = eocc[n].inject(0){|m, e| m + e.maxOccurs.to_i} * particle.maxOccurs.to_i
         end
-        Particle.new(:element, [], min, max, eocc[n].first.node)
+        if n == "#any#"
+          Particle.new(:any, [], min, max, eocc[n].first.node)
+        else
+          Particle.new(:element, [], min, max, eocc[n].first.node)
+        end
       end
     end
   end
@@ -137,6 +150,12 @@ def build_particles_trees(node)
       else
         trees << Particle.new(:element, [], e.minOccurs || "1", e.maxOccurs || "1", e)
       end
+    end
+  end
+  # ComplexType and complex content extension don't have 'any' particles
+  if node.respond_to?(:any)
+    node.any.each do |a|
+      trees << Particle.new(:any, [], a.minOccurs || "1", a.maxOccurs || "1", a)
     end
   end
   trees

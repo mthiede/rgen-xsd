@@ -52,7 +52,21 @@ require 'rgen/xsd/simple_type'
 #
 # 1.3.2  Element Particles with Simple Type are mapped to to attributes
 #
-# TODO: Wildcards (any)
+# 1.4 Wildcards (any)
+#
+# * there can be one wildcard attribute for each class created from a complex type
+#   by convention, the attribute is called "anyObject"; the attribute type is EObject
+#
+# * 'any' particles are collected recursively through the type's content model just
+#   as with element particles; however, in the end all of them will be condensed into one
+#   the multiplicity is calculated in the same way as for element particles
+#
+# * Note: depending on the value of the "processContents" attribute, XML instances may
+#   be forced to use only existing types in the "any" section (value "strict"); this
+#   means that all possible target types of the attribute would be known; so in theory
+#   the target type could be a superclass of all possible complex types (using "strict",
+#   XML instances may either make use of a toplevel element definition or any complex
+#   type using the xsi:type attribute)
 #
 # 1.5 Attributes are mapped to attributes
 #
@@ -116,14 +130,22 @@ class XSDToEcoreTransformer < RGen::Transformer
     end 
     _particles = add_substitution_particles(_particles)
     _particles.each do |p|
-      e = p.node
-      if e.effectiveType.is_a?(XMLSchemaMetamodel::ComplexType)
-        _features << @env_out.new(RGen::ECore::EReference, :name => e.name, :containment => true, 
-          :upperBound => p.maxOccurs == "unbounded" ? -1 : p.maxOccurs,
+      if p.kind == :element
+        e = p.node
+        if e.effectiveType.is_a?(XMLSchemaMetamodel::ComplexType)
+          _features << @env_out.new(RGen::ECore::EReference, :name => e.name, :containment => true, 
+            :upperBound => p.maxOccurs == "unbounded" ? -1 : p.maxOccurs,
+            :lowerBound => p.minOccurs,
+            :eType => trans(e.effectiveType))
+        elsif e.effectiveType.is_a?(XMLSchemaMetamodel::SimpleType)
+          _features << create_attribute(e.name, e.effectiveType)
+        end
+      else
+        # any
+        _features << @env_out.new(RGen::ECore::EAttribute, :name => "anyObject", 
           :lowerBound => p.minOccurs,
-          :eType => trans(e.effectiveType))
-      elsif e.effectiveType.is_a?(XMLSchemaMetamodel::SimpleType)
-        _features << create_attribute(e.name, e.effectiveType)
+          :upperBound => p.maxOccurs == "unbounded" ? -1 : p.maxOccurs,
+          :eType => RGen::ECore::ERubyObject)
       end
     end
     allAttributes.effectiveAttribute.each do |a|
