@@ -54,14 +54,14 @@ end
 
 def builtin_type(type)
   case type.targetIdentifier.split(":").last
-  when "string", "QName", "NCName", "anyURI", "NMTOKEN", "ID", "token"
+  when "string", "QName", "NCName", "anyURI", "NMTOKEN", "ID", "token", "anySimpleType"
     :string
   when "decimal", "integer", "nonNegativeInteger"
     :int
   when "boolean"
     :boolean
   else
-    puts "Unsupported simple type: #{t.targetIdentifier}"
+    puts "Unsupported simple type: #{type.targetIdentifier}"
     nil
   end
 end

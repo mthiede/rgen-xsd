@@ -88,6 +88,8 @@ class XSIInstantiator
         else
           element.setGeneric(f.name, value_from_string(element, f, str))
         end 
+      elsif name == "schemaLocation"
+        # ignore, this may occure with any XML element
       else
         problem "could not determine feature for attribute #{name}, #{feats.size} options", node
       end

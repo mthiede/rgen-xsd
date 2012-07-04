@@ -1,8 +1,8 @@
 require 'rgen/ecore/ecore'
 require 'rgen/util/name_helper'
 require 'rgen/transformer'
-require 'particle'
-require 'simple_type'
+require 'rgen/xsd/particle'
+require 'rgen/xsd/simple_type'
 
 # Mapping Strategy:
 # 

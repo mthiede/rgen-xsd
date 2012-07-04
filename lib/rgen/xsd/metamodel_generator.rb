@@ -1,13 +1,11 @@
-$:.unshift(File.dirname(__FILE__)+"/lib")
+$:.unshift(File.dirname(__FILE__)+"/../../")
 
-require "xsd_instantiator"
 require "rgen/environment"
 require "rgen/util/name_helper"
-require "rtext/language"
-require "rtext/serializer"
 require 'mmgen/metamodel_generator'
 
-require "xml_schema_metamodel_generated"
+require "rgen/xsd/xsd_instantiator"
+require "rgen/xsd/1.1/metamodel"
 XMLSchemaMetamodel = MM::W3Org2001XMLSchema
 
 include RGen::Util::NameHelper
@@ -28,8 +26,8 @@ urefs = inst.unresolved_refs
 end
 puts urefs.size
 
-require "xml_schema_metamodel_ext"
-require "xsd_to_ecore"
+require "rgen/xsd/xml_schema_metamodel_ext"
+require "rgen/xsd/xsd_to_ecore"
 
 sch = env.find(:class => XMLSchemaMetamodel::Element, :name => "schema").first
 #puts sch.complexType.allElements.collect{|e| e.effectiveElement.name+" "+e.effectiveType.name.to_s}.join("\n")
@@ -107,7 +105,7 @@ create_opposite(env_ecore, "Attribute#simpleType", "containingAttribute", 1)
 #end
 
 include MMGen::MetamodelGenerator
-generateMetamodel(root, "lib/xml_schema_metamodel_generated.rb")
+generateMetamodel(root, "metamodel.rb")
 
 # lang = RText::Language.new(XMLSchemaMetamodel.ecore, {
 #   :feature_provider => proc {|c| c.eAllStructuralFeatures.reject{|f| f.derived}}

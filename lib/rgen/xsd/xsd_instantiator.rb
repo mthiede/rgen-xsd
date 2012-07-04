@@ -1,4 +1,4 @@
-require "xsi_instantiator"
+require "rgen/xsd/xsi_instantiator"
 require "rgen/instantiator/reference_resolver"
 
 class XSDInstantiator
