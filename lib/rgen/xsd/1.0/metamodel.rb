@@ -351,7 +351,7 @@ MM::W3Org2001XMLSchema::Element.contains_many_uni 'unique', MM::W3Org2001XMLSche
 MM::W3Org2001XMLSchema::Element.contains_many_uni 'key', MM::W3Org2001XMLSchema::Keybase 
 MM::W3Org2001XMLSchema::Element.contains_many_uni 'keyref', MM::W3Org2001XMLSchema::KeyrefTYPE 
 MM::W3Org2001XMLSchema::Element.has_one 'ref', MM::W3Org2001XMLSchema::Element 
-MM::W3Org2001XMLSchema::Element.has_one 'type', MM::W3Org2001XMLSchema::ComplexType 
+MM::W3Org2001XMLSchema::Element.has_one 'type', MM::W3Org2001XMLSchema::Type 
 MM::W3Org2001XMLSchema::Element.many_to_one 'substitutionGroup', MM::W3Org2001XMLSchema::Element, 'substitutes' 
 MM::W3Org2001XMLSchema::Keybase.contains_one_uni 'selector', MM::W3Org2001XMLSchema::SelectorTYPE, :lowerBound => 1 
 MM::W3Org2001XMLSchema::Keybase.contains_many_uni 'field', MM::W3Org2001XMLSchema::FieldTYPE, :lowerBound => 1 

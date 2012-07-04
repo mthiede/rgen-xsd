@@ -57,6 +57,7 @@ if problems.size > 0
   problems.each do |p|
     puts p
   end
+  puts "#{problems.size} problems, stop."
   exit
 end
 
@@ -116,7 +117,7 @@ attribute_to_reference(env_ecore, "RestrictionType#base", class_type)
 attribute_to_reference(env_ecore, "RestrictionTYPE#base", class_type)
 attribute_to_reference(env_ecore, "ExtensionType#base", class_type)
 attribute_to_reference(env_ecore, "Element#ref", class_element)
-attribute_to_reference(env_ecore, "Element#type", class_complexType)
+attribute_to_reference(env_ecore, "Element#type", class_type)
 attribute_to_reference(env_ecore, "Group#ref", class_group)
 attribute_to_reference(env_ecore, "AttributeGroup#ref", class_attributeGroup)
 attribute_to_reference(env_ecore, "Attribute#ref", class_attribute)

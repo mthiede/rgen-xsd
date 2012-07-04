@@ -112,7 +112,10 @@ class XSDToEcoreTransformer < RGen::Transformer
       child_elements(s).each{|e| @package_by_source_element[e] = p}
     end
     trans(schemas.complexType)
-    trans(schemas.element.effectiveType)
+    trans(schemas.element.effectiveType.select do |t|
+      t.is_a?(XMLSchemaMetamodel::ComplexType) ||
+      build_type_desc(t).type.is_a?(Array)
+    end)
     root
   end
 
@@ -160,8 +163,8 @@ class XSDToEcoreTransformer < RGen::Transformer
     { :name => firstToUpper(name || containingElement.name+"TYPE"),
       :abstract => abstract,
       :eStructuralFeatures => _features,
-      :eSuperTypes => [trans(complexContent.andand.extension.andand.base || 
-        complexContent.andand.restriction.andand.base)],
+      :eSuperTypes => trans([complexContent.andand.extension.andand.base || 
+        complexContent.andand.restriction.andand.base].compact.select{|t| t.is_a?(XMLSchemaMetamodel::ComplexType)}),
       :ePackage => @package_by_source_element[@current_object]
     }
   end

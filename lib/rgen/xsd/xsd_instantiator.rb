@@ -55,7 +55,7 @@ class XSDInstantiator
     unresolved_refs.each do |ur|
       if ur.proxy.targetIdentifier =~ /^http:\/\/www\.w3\.org\/2001\/XMLSchema:(\w+)$/
         name = $1
-        if [ "anySimpleType", "string", "normalizedString", "token", "language", "Name", "NCName", 
+        if [ "anyType", "anySimpleType", "string", "normalizedString", "token", "language", "Name", "NCName", 
            "ID", "IDREF", "ENTITY", "NMTOKEN", "base64Binary", "hexBinary", "anyURI", "QName", 
            "NOTATION", "duration", "dateTime", "time", "date", "gYearMonth", "gYear", "gMonthDay", 
            "gDay", "gMonth", "IDREFS", "ENTITIES", "NMTOKENS", "float", "double",

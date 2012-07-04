@@ -56,6 +56,8 @@ def builtin_type(type)
     return SimpleType.new(:string, false, 0, 1)
   end
   case type.name
+  when "anyType"
+    SimpleType.new(:object, false, 0, 1)
   when "anySimpleType", "string", "normalizedString", "token", "language", "Name", "NCName", 
        "ID", "IDREF", "ENTITY", "NMTOKEN", "base64Binary", "hexBinary", "anyURI", "QName", 
        "NOTATION", "duration", "dateTime", "time", "date", "gYearMonth", "gYear", "gMonthDay", 
