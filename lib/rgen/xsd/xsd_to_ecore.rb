@@ -191,7 +191,7 @@ class XSDToEcoreTransformer < RGen::Transformer
     end
     if simpleContent.andand.extension.andand.base || simpleContent.andand.restriction.andand.base
       _features << @env_out.new(RGen::ECore::EAttribute, :name => "simpleValue", 
-        :eType => get_datatype(simpleContent.andand.extension.andand.base || simpleContent.andand.restriction.andand.base),
+        :eType => get_datatype(simple_content_base_type(@current_object)),
         :eAnnotations => [create_annotation("simpleContent", "true")])
     end
     { :name => @class_name_provider.call(@current_object),
@@ -201,6 +201,14 @@ class XSDToEcoreTransformer < RGen::Transformer
         complexContent.andand.restriction.andand.base].compact.select{|t| t.is_a?(XMLSchemaMetamodel::ComplexType)}),
       :ePackage => @package_by_source_element[@current_object]
     }
+  end
+
+  def simple_content_base_type(type)
+    base = type.simpleContent.andand.extension.andand.base || type.simpleContent.andand.restriction.andand.base
+    while base.is_a?(XMLSchemaMetamodel::ComplexType)
+      base = base.simpleContent.andand.extension.andand.base || base.simpleContent.andand.restriction.andand.base
+    end
+    base
   end
 
   def create_annotation(key, value)

@@ -47,7 +47,7 @@ def build_type_desc(type)
       SimpleType.new(:string, false, 0, 1)
     end  
   else
-    puts "WARN: unknown node type: #{type.collect{|t| t.class}.inspect}"
+    puts "WARN: unknown node type: #{type.class}"
     SimpleType.new(:string, false, 0, 1)
   end
 end
