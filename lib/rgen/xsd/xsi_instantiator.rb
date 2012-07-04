@@ -18,7 +18,6 @@ class XSIInstantiator
   end
 
   def instantiate(file, options={})
-    @xml_name_provider = options[:xml_name_provider] || lambda {|o| raise "default xml name provider"}
     @unresolved_refs = []
     root = nil
     root_class = options[:root_class].andand.ecore || root_class(doc.root.name)
@@ -169,10 +168,9 @@ class XSIInstantiator
     return @classes_by_xml_name[name] || [] if @classes_by_xml_name
     @classes_by_xml_name = {}
     @mm.ecore.eAllClasses.each do |c|
-      xml_names(c).each do |n|
-        @classes_by_xml_name[n] ||= []
-        @classes_by_xml_name[n] << c
-      end
+      n = xml_name(c)
+      @classes_by_xml_name[n] ||= []
+      @classes_by_xml_name[n] << c
     end
     @classes_by_xml_name[name]
   end
@@ -181,23 +179,16 @@ class XSIInstantiator
     return @features_by_xml_name[name] || [] if @features_by_xml_name
     @features_by_xml_name = {}
     @mm.ecore.eAllClasses.eStructuralFeatures.each do |f|
-      xml_names(f).each do |n|
-        @features_by_xml_name[n] ||= []
-        @features_by_xml_name[n] << f
-      end
+      n = xml_name(f)
+      @features_by_xml_name[n] ||= []
+      @features_by_xml_name[n] << f
     end
     @features_by_xml_name[name]
   end
 
-  def xml_names(o)
-    xml_name = annotation_value(o, "xmlName")
-    if xml_name
-      xml_name.split(",").collect{|p| p.split("=").first}
-    else
-      [@xml_name_provider.call(o)]
-    end
+  def xml_name(o)
+    annotation_value(o, "xmlName") || o.name
   end
-
 
   def annotation_value(o, key)
     anno = o.eAnnotations.find{|a| a.source == "xsd"}

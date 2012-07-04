@@ -17,10 +17,7 @@ class XSDInstantiator
   def instantiate(file_name)
     inst = XSIInstantiator.new(@mm, @env)
     schema = inst.instantiate(file_name, 
-      :root_class => XMLSchemaMetamodel::SchemaTYPE,
-      :xml_name_provider => lambda do |o|
-        firstToLower(o.name)
-      end
+      :root_class => XMLSchemaMetamodel::SchemaTYPE
     )
     urefs = inst.unresolved_refs
     urefs.each do |ur|

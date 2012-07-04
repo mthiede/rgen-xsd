@@ -99,9 +99,32 @@ class XSDToEcoreTransformer < RGen::Transformer
   include Particle
   include SimpleType
 
-  def initialize(env_in, env_out)
+  # Options:
+  #  
+  # :class_name_provider:
+  #   a proc which receives a ComplexType and should return the EClass name
+  #
+  # :feature_name_provider:
+  #   a proc which receives an Element or Attribute and should return the EStructuralFeature name
+  # 
+  # :enum_name_provider:
+  #   a proc which receives a SimpleType and should return the EEnum name
+  #
+  def initialize(env_in, env_out, options={})
     super(env_in, env_out)
     @package_by_source_element = {}
+    @class_name_provider = options[:class_name_provider] || proc do |type|
+      firstToUpper(type.name || type.containingElement.name+"TYPE")
+    end
+    @feature_name_provider = options[:feature_name_provider] || proc do |ea|
+      firstToLower(ea.name)
+    end
+    @enum_name_provider = options[:enum_name_provider] || proc do |type|
+      uniq_classifier_name(@package_by_source_element[type], 
+        type.name ? firstToUpper(type.name)+"Enum" : 
+          type.containingAttribute ? firstToUpper(type.containingAttribute.effectiveAttribute.name)+"Enum" :
+          "Unknown")
+    end
   end
 
   def transform
@@ -139,12 +162,16 @@ class XSDToEcoreTransformer < RGen::Transformer
       if p.kind == :element
         e = p.node
         if e.effectiveType.is_a?(XMLSchemaMetamodel::ComplexType)
-          _features << @env_out.new(RGen::ECore::EReference, :name => e.name, :containment => true, 
+          fn = @feature_name_provider.call(e)
+          _features << @env_out.new(RGen::ECore::EReference, :name => fn, :containment => true, 
             :upperBound => p.maxOccurs == "unbounded" ? -1 : p.maxOccurs,
             :lowerBound => p.minOccurs,
             :eType => trans(e.effectiveType))
+          if fn != e.name
+            _features.last.eAnnotations = [create_annotation("xmlName", e.name)]
+          end
         elsif e.effectiveType.is_a?(XMLSchemaMetamodel::SimpleType)
-          _features << create_attribute(e.name, e.effectiveType)
+          _features << create_attribute(e)
         end
       else
         # any
@@ -155,15 +182,14 @@ class XSDToEcoreTransformer < RGen::Transformer
       end
     end
     allAttributes.effectiveAttribute.each do |a|
-      _features << create_attribute(a.name, a.effectiveType) 
+      _features << create_attribute(a) 
     end
     if mixed
       _features << @env_out.new(RGen::ECore::EAttribute, :name => "text", 
         :eType => RGen::ECore::EString,
-        :eAnnotations => [ @env_out.new(RGen::ECore::EAnnotation, :source => "xsd", :details => 
-          [@env_out.new(RGen::ECore::EStringToStringMapEntry, :key => "simpleContent", :value => "true")])])
+        :eAnnotations => [create_annotation("simpleContent", "true")])
     end
-    { :name => firstToUpper(name || containingElement.name+"TYPE"),
+    { :name => @class_name_provider.call(@current_object),
       :abstract => abstract,
       :eStructuralFeatures => _features,
       :eSuperTypes => trans([complexContent.andand.extension.andand.base || 
@@ -172,12 +198,22 @@ class XSDToEcoreTransformer < RGen::Transformer
     }
   end
 
-  def create_attribute(name, type)
-    td = build_type_desc(type)
-    @env_out.new(RGen::ECore::EAttribute, :name => name, 
+  def create_annotation(key, value)
+     @env_out.new(RGen::ECore::EAnnotation, :source => "xsd", :details => 
+       [@env_out.new(RGen::ECore::EStringToStringMapEntry, :key => key, :value => value)])
+  end
+
+  def create_attribute(e)
+    td = build_type_desc(e.effectiveType)
+    fn = @feature_name_provider.call(e)
+    result = @env_out.new(RGen::ECore::EAttribute, :name => fn, 
       :lowerBound => td.minOccurs,
       :upperBound => td.maxOccurs,
-      :eType => get_datatype(type))
+      :eType => get_datatype(e.effectiveType))
+    if fn != e.name
+      result.eAnnotations = [create_annotation("xmlName", e.name)]
+    end
+    result
   end
 
   def get_datatype(type)
@@ -201,10 +237,7 @@ class XSDToEcoreTransformer < RGen::Transformer
   transform XMLSchemaMetamodel::SimpleType, :to => EEnum do
     _literals = build_type_desc(@current_object).type
     raise "not an enum: #{@current_object.class}" unless _literals.is_a?(Array)
-    { :name => uniq_classifier_name(@package_by_source_element[@current_object], 
-        name ? firstToUpper(name)+"Enum" : 
-          containingAttribute ? firstToUpper(containingAttribute.effectiveAttribute.name)+"Enum" :
-          "Unknown"),
+    { :name => @enum_name_provider.call(@current_object),
       :eLiterals => _literals.collect{|l| @env_out.new(RGen::ECore::EEnumLiteral, :name => l)},
       :ePackage => @package_by_source_element[@current_object]
     }
