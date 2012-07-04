@@ -4,6 +4,9 @@ require 'rgen/transformer'
 require 'rgen/xsd/particle'
 require 'rgen/xsd/simple_type'
 
+module RGen
+module XSD
+
 # Mapping Strategy:
 # 
 # 1. Complex Types are mapped to classes
@@ -233,3 +236,7 @@ class XSDToEcoreTransformer < RGen::Transformer
   end
 
 end
+
+end
+end
+

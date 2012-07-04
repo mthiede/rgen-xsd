@@ -3,6 +3,9 @@ require 'andand'
 require 'rgen/ecore/ecore'
 require 'rgen/instantiator/reference_resolver'
 
+module RGen
+module XSD
+
 class XSIInstantiator
   attr_reader :unresolved_refs
   attr_reader :namespaces
@@ -202,3 +205,7 @@ class XSIInstantiator
   end
 
 end
+
+end
+end
+

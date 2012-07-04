@@ -1,3 +1,5 @@
+module RGen
+module XSD
 module SimpleType
 
 SimpleType = Struct.new(:type, :isList, :minOccurs, :maxOccurs)
@@ -78,5 +80,7 @@ def builtin_type(type)
   end
 end
 
+end
+end
 end
 

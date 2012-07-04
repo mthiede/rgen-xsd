@@ -1,6 +1,9 @@
 require "rgen/xsd/xsi_instantiator"
 require "rgen/instantiator/reference_resolver"
 
+module RGen
+module XSD
+
 class XSDInstantiator
   attr_reader :unresolved_refs
 
@@ -78,3 +81,5 @@ class XSDInstantiator
     
 end
 
+end
+end

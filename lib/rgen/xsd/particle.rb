@@ -1,3 +1,5 @@
+module RGen
+module XSD
 module Particle
 
 # helper structure representing a particle or particle tree
@@ -161,5 +163,7 @@ def build_particles_trees(node)
   trees
 end
 
+end
+end
 end
 
