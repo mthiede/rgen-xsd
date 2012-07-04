@@ -46,8 +46,35 @@ class XSDInstantiator
   end
 
   def resolve(problems=nil)
+    @unresolved_refs = @resolver.resolve(unresolved_refs, :problems => [], :use_target_type => true)
+    add_missing_builtin_types
     @unresolved_refs = @resolver.resolve(unresolved_refs, :problems => problems, :use_target_type => true)
   end
 
+  def add_missing_builtin_types
+    unresolved_refs.each do |ur|
+      if ur.proxy.targetIdentifier =~ /^http:\/\/www\.w3\.org\/2001\/XMLSchema:(\w+)$/
+        name = $1
+        if [ "anySimpleType", "string", "normalizedString", "token", "language", "Name", "NCName", 
+           "ID", "IDREF", "ENTITY", "NMTOKEN", "base64Binary", "hexBinary", "anyURI", "QName", 
+           "NOTATION", "duration", "dateTime", "time", "date", "gYearMonth", "gYear", "gMonthDay", 
+           "gDay", "gMonth", "IDREFS", "ENTITIES", "NMTOKENS", "float", "double",
+           "decimal", "integer", "nonPositiveInteger", "negativeInteger", "long", "int", "short",
+           "byte", "nonNegativeInteger", "unsignedLong", "unsignedInt", "unsignedShort", 
+           "unsignedByte", "positiveInteger", "boolean" ].include?(name)
+            add_builtin_type(ur.proxy.targetIdentifier, name)
+        end
+      end
+    end
+  end
+
+  def add_builtin_type(target_identifier, name)
+    @builtin_type_added ||= {}
+    return if @builtin_type_added[target_identifier]
+    type = @env.new(XMLSchemaMetamodel::TopLevelSimpleType, :name => name)
+    @resolver.add_identifier(target_identifier, type)
+    @builtin_type_added[target_identifier] = true
+  end
+    
 end
 

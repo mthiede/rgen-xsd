@@ -87,7 +87,7 @@ end
 
 class MM::W3Org2001XMLSchema::Facet < MM::W3Org2001XMLSchema::Annotated
    has_attr 'value', String 
-   has_attr 'fixed', String 
+   has_attr 'fixed', Boolean 
 end
 
 class MM::W3Org2001XMLSchema::NumFacet < MM::W3Org2001XMLSchema::Facet
@@ -111,8 +111,8 @@ end
 class MM::W3Org2001XMLSchema::ComplexType < MM::W3Org2001XMLSchema::Type
    abstract
    has_attr 'name', String 
-   has_attr 'mixed', String 
-   has_attr 'abstract', String 
+   has_attr 'mixed', Boolean 
+   has_attr 'abstract', Boolean 
    has_attr 'final', Object 
    has_attr 'block', Object 
 end
@@ -120,7 +120,7 @@ end
 class MM::W3Org2001XMLSchema::Group < MM::W3Org2001XMLSchema::Annotated
    abstract
    has_attr 'name', String 
-   has_attr 'minOccurs', String 
+   has_attr 'minOccurs', Integer 
    has_attr 'maxOccurs', Object 
 end
 
@@ -153,7 +153,7 @@ class MM::W3Org2001XMLSchema::SimpleContentTYPE < MM::W3Org2001XMLSchema::Annota
 end
 
 class MM::W3Org2001XMLSchema::ComplexContentTYPE < MM::W3Org2001XMLSchema::Annotated
-   has_attr 'mixed', String 
+   has_attr 'mixed', Boolean 
 end
 
 class MM::W3Org2001XMLSchema::RestrictionType < MM::W3Org2001XMLSchema::Annotated
@@ -175,13 +175,13 @@ class MM::W3Org2001XMLSchema::Element < MM::W3Org2001XMLSchema::Annotated
    abstract
    has_attr 'default', String 
    has_attr 'fixed', String 
-   has_attr 'nillable', String 
-   has_attr 'abstract', String 
+   has_attr 'nillable', Boolean 
+   has_attr 'abstract', Boolean 
    has_attr 'final', Object 
    has_attr 'block', Object 
    has_attr 'form', MM::W3Org2001XMLSchema::FormChoiceEnum 
    has_attr 'name', String 
-   has_attr 'minOccurs', String 
+   has_attr 'minOccurs', Integer 
    has_attr 'maxOccurs', Object 
 end
 
@@ -189,7 +189,7 @@ class MM::W3Org2001XMLSchema::LocalElement < MM::W3Org2001XMLSchema::Element
 end
 
 class MM::W3Org2001XMLSchema::AnyTYPE < MM::W3Org2001XMLSchema::Wildcard
-   has_attr 'minOccurs', String 
+   has_attr 'minOccurs', Integer 
    has_attr 'maxOccurs', Object 
 end
 

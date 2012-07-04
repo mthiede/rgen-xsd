@@ -1,3 +1,3 @@
 task :default do
-  sh "ruby -I../../../../../rgen/lib ../metamodel_generator.rb structures.xml datatypes.xml ../xml/xml.xsd"
+  sh "ruby -I../../../../../rgen/lib ../metamodel_generator.rb --mm 1.0 -o metamodel.rb structures.xml datatypes.xml ../xml/xml.xsd"
 end

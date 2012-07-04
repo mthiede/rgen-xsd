@@ -181,6 +181,8 @@ class XSDToEcoreTransformer < RGen::Transformer
       RGen::ECore::EString
     when :int
       RGen::ECore::EInt
+    when :float
+      RGen::ECore::EFloat
     when :boolean
       RGen::ECore::EBoolean
     when :object

@@ -5,10 +5,42 @@ require "rgen/util/name_helper"
 require 'mmgen/metamodel_generator'
 
 require "rgen/xsd/xsd_instantiator"
-require "rgen/xsd/1.1/metamodel"
-XMLSchemaMetamodel = MM::W3Org2001XMLSchema
-
+require 'optparse'
+ 
 include RGen::Util::NameHelper
+
+options = {}
+optparse = OptionParser.new do|opts|
+  opts.banner = "Usage: metamodel_generator.rb [options] <schema file>+"
+
+  opts.on( '--mm VERSION', 'XML schema version: 1.0 or 1.1' ) do |v|
+    options[:mm] = v
+  end
+
+  opts.on('-o FILE', "Output metamodel file") do |f|
+    options[:outfile] = f
+  end
+end
+optparse.parse!
+if !options[:mm]
+  puts "Schema version not specified" 
+  exit
+end
+if !options[:outfile]
+  puts "Output file not specified" 
+  exit
+end
+
+case options[:mm]
+when "1.0"
+  require "rgen/xsd/1.0/metamodel"
+when "1.1"
+  require "rgen/xsd/1.1/metamodel"
+else
+  puts "Unknown schema version: #{options[:mm]}"
+  exit
+end
+XMLSchemaMetamodel = MM::W3Org2001XMLSchema
 
 env = RGen::Environment.new
 mm = XMLSchemaMetamodel
@@ -18,20 +50,20 @@ ARGV.each do |fn|
   inst.instantiate(fn)
 end
 
-inst.resolve
+problems = []
+inst.resolve(problems)
 
-urefs = inst.unresolved_refs
- urefs.each do |r|
-   puts r.proxy.targetIdentifier
+if problems.size > 0
+  problems.each do |p|
+    puts p
+  end
+  exit
 end
-puts urefs.size
 
 require "rgen/xsd/xml_schema_metamodel_ext"
 require "rgen/xsd/xsd_to_ecore"
 
 sch = env.find(:class => XMLSchemaMetamodel::Element, :name => "schema").first
-#puts sch.complexType.allElements.collect{|e| e.effectiveElement.name+" "+e.effectiveType.name.to_s}.join("\n")
-#exit
 
 env_ecore = RGen::Environment.new
 trans = XSDToEcoreTransformer.new(env, env_ecore)
@@ -98,20 +130,6 @@ create_opposite(env_ecore, "Element#substitutionGroup", "substitutes", -1)
 create_opposite(env_ecore, "Element#complexType", "containingElement", 1)
 create_opposite(env_ecore, "Attribute#simpleType", "containingAttribute", 1)
 
-#puts problems.collect{|p| p.to_s}.join("\n")
-
-#env.find(:class => mm::Annotatable).each do |a|
-  #a.annotation = []
-#end
-
 include MMGen::MetamodelGenerator
-generateMetamodel(root, "metamodel.rb")
+generateMetamodel(root, options[:outfile])
 
-# lang = RText::Language.new(XMLSchemaMetamodel.ecore, {
-#   :feature_provider => proc {|c| c.eAllStructuralFeatures.reject{|f| f.derived}}
-# })
-# ser = RText::Serializer.new(lang)
-# File.open("temp.txt", "w") do |f|
-#   ser.serialize(env.find(:class => XMLSchemaMetamodel::Schema), f)
-# end
-# 
