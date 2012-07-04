@@ -28,7 +28,8 @@ end
 
 module ComplexType::ClassModule
   def allAttributes
-    attribute + (complexContent.andand.extension.andand.allAttributes || [])
+    attribute + (complexContent.andand.extension.andand.allAttributes || []) +
+      (simpleContent.andand.extension.andand.allAttributes || [])
   end
 end
 

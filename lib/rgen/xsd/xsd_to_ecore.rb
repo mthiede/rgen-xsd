@@ -189,6 +189,11 @@ class XSDToEcoreTransformer < RGen::Transformer
         :eType => RGen::ECore::EString,
         :eAnnotations => [create_annotation("simpleContent", "true")])
     end
+    if simpleContent.andand.extension.andand.base || simpleContent.andand.restriction.andand.base
+      _features << @env_out.new(RGen::ECore::EAttribute, :name => "simpleValue", 
+        :eType => get_datatype(simpleContent.andand.extension.andand.base || simpleContent.andand.restriction.andand.base),
+        :eAnnotations => [create_annotation("simpleContent", "true")])
+    end
     { :name => @class_name_provider.call(@current_object),
       :abstract => abstract,
       :eStructuralFeatures => _features,
