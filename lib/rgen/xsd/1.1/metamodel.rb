@@ -8,6 +8,7 @@ module MM
    module W3Org2001XMLSchema
       extend RGen::MetamodelBuilder::ModuleExtension
       include RGen::MetamodelBuilder::DataTypes
+      annotation :source => "xsd", :details => {'xmlName' => 'http://www.w3.org/2001/XMLSchema'}
 
       UseEnum = Enum.new(:name => 'UseEnum', :literals =>[ :prohibited, :optional, :required ])
       FormChoiceEnum = Enum.new(:name => 'FormChoiceEnum', :literals =>[ :qualified, :unqualified ])
@@ -19,11 +20,13 @@ module MM
    module W3OrgXML1998Namespace
       extend RGen::MetamodelBuilder::ModuleExtension
       include RGen::MetamodelBuilder::DataTypes
+      annotation :source => "xsd", :details => {'xmlName' => 'http://www.w3.org/XML/1998/namespace'}
 
    end
 end
 
 class MM::W3Org2001XMLSchema::AnyType < RGen::MetamodelBuilder::MMBase
+   annotation :source => "xsd", :details => {'xmlName' => 'anyType'}
    has_many_attr 'anyObject', Object 
    has_attr 'text', String do
       annotation :source => "xsd", :details => {'simpleContent' => 'true'}
@@ -31,9 +34,11 @@ class MM::W3Org2001XMLSchema::AnyType < RGen::MetamodelBuilder::MMBase
 end
 
 class MM::W3Org2001XMLSchema::OpenAttrs < MM::W3Org2001XMLSchema::AnyType
+   annotation :source => "xsd", :details => {'xmlName' => 'openAttrs'}
 end
 
 class MM::W3Org2001XMLSchema::Annotated < MM::W3Org2001XMLSchema::OpenAttrs
+   annotation :source => "xsd", :details => {'xmlName' => 'annotated'}
    has_attr 'id', String 
 end
 
@@ -59,6 +64,7 @@ class MM::W3Org2001XMLSchema::DocumentationTYPE < RGen::MetamodelBuilder::MMBase
 end
 
 class MM::W3Org2001XMLSchema::Attribute < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'attribute'}
    has_attr 'use', MM::W3Org2001XMLSchema::UseEnum 
    has_attr 'default', String 
    has_attr 'fixed', String 
@@ -73,11 +79,13 @@ end
 
 class MM::W3Org2001XMLSchema::SimpleType < MM::W3Org2001XMLSchema::Type
    abstract
+   annotation :source => "xsd", :details => {'xmlName' => 'simpleType'}
    has_attr 'final', Object 
    has_attr 'name', String 
 end
 
 class MM::W3Org2001XMLSchema::LocalSimpleType < MM::W3Org2001XMLSchema::SimpleType
+   annotation :source => "xsd", :details => {'xmlName' => 'localSimpleType'}
 end
 
 class MM::W3Org2001XMLSchema::RestrictionTYPE < MM::W3Org2001XMLSchema::Annotated
@@ -91,17 +99,20 @@ class MM::W3Org2001XMLSchema::UnionTYPE < MM::W3Org2001XMLSchema::Annotated
 end
 
 class MM::W3Org2001XMLSchema::Facet < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'facet'}
    has_attr 'value', String 
    has_attr 'fixed', Boolean 
 end
 
 class MM::W3Org2001XMLSchema::NumFacet < MM::W3Org2001XMLSchema::Facet
+   annotation :source => "xsd", :details => {'xmlName' => 'numFacet'}
 end
 
 class MM::W3Org2001XMLSchema::TotalDigitsTYPE < MM::W3Org2001XMLSchema::NumFacet
 end
 
 class MM::W3Org2001XMLSchema::NoFixedFacet < MM::W3Org2001XMLSchema::Facet
+   annotation :source => "xsd", :details => {'xmlName' => 'noFixedFacet'}
 end
 
 class MM::W3Org2001XMLSchema::WhiteSpaceTYPE < MM::W3Org2001XMLSchema::Facet
@@ -111,6 +122,7 @@ class MM::W3Org2001XMLSchema::PatternTYPE < MM::W3Org2001XMLSchema::NoFixedFacet
 end
 
 class MM::W3Org2001XMLSchema::Assertion < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'assertion'}
    has_attr 'test', String 
    has_attr 'xpathDefaultNamespace', Object 
 end
@@ -119,10 +131,12 @@ class MM::W3Org2001XMLSchema::ExplicitTimezoneTYPE < MM::W3Org2001XMLSchema::Fac
 end
 
 class MM::W3Org2001XMLSchema::TopLevelAttribute < MM::W3Org2001XMLSchema::Attribute
+   annotation :source => "xsd", :details => {'xmlName' => 'topLevelAttribute'}
 end
 
 class MM::W3Org2001XMLSchema::ComplexType < MM::W3Org2001XMLSchema::Type
    abstract
+   annotation :source => "xsd", :details => {'xmlName' => 'complexType'}
    has_attr 'name', String 
    has_attr 'mixed', Boolean 
    has_attr 'abstract', Boolean 
@@ -133,32 +147,40 @@ end
 
 class MM::W3Org2001XMLSchema::Group < MM::W3Org2001XMLSchema::Annotated
    abstract
+   annotation :source => "xsd", :details => {'xmlName' => 'group'}
    has_attr 'name', String 
    has_attr 'minOccurs', Integer 
    has_attr 'maxOccurs', Object 
 end
 
 class MM::W3Org2001XMLSchema::RealGroup < MM::W3Org2001XMLSchema::Group
+   annotation :source => "xsd", :details => {'xmlName' => 'realGroup'}
 end
 
 class MM::W3Org2001XMLSchema::GroupRef < MM::W3Org2001XMLSchema::RealGroup
+   annotation :source => "xsd", :details => {'xmlName' => 'groupRef'}
 end
 
 class MM::W3Org2001XMLSchema::ExplicitGroup < MM::W3Org2001XMLSchema::Group
+   annotation :source => "xsd", :details => {'xmlName' => 'explicitGroup'}
 end
 
 class MM::W3Org2001XMLSchema::All < MM::W3Org2001XMLSchema::ExplicitGroup
+   annotation :source => "xsd", :details => {'xmlName' => 'all'}
 end
 
 class MM::W3Org2001XMLSchema::AttributeGroup < MM::W3Org2001XMLSchema::Annotated
    abstract
+   annotation :source => "xsd", :details => {'xmlName' => 'attributeGroup'}
    has_attr 'name', String 
 end
 
 class MM::W3Org2001XMLSchema::AttributeGroupRef < MM::W3Org2001XMLSchema::AttributeGroup
+   annotation :source => "xsd", :details => {'xmlName' => 'attributeGroupRef'}
 end
 
 class MM::W3Org2001XMLSchema::Wildcard < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'wildcard'}
    has_attr 'namespace', Object 
    has_many_attr 'notNamespace', Object, :lowerBound => 1 
    has_attr 'processContents', MM::W3Org2001XMLSchema::ProcessContentsEnum 
@@ -180,23 +202,29 @@ class MM::W3Org2001XMLSchema::ComplexContentTYPE < MM::W3Org2001XMLSchema::Annot
 end
 
 class MM::W3Org2001XMLSchema::RestrictionType < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'restrictionType'}
    has_many_attr 'anyObject', Object 
 end
 
 class MM::W3Org2001XMLSchema::SimpleRestrictionType < MM::W3Org2001XMLSchema::RestrictionType
+   annotation :source => "xsd", :details => {'xmlName' => 'simpleRestrictionType'}
 end
 
 class MM::W3Org2001XMLSchema::ExtensionType < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'extensionType'}
 end
 
 class MM::W3Org2001XMLSchema::SimpleExtensionType < MM::W3Org2001XMLSchema::ExtensionType
+   annotation :source => "xsd", :details => {'xmlName' => 'simpleExtensionType'}
 end
 
 class MM::W3Org2001XMLSchema::ComplexRestrictionType < MM::W3Org2001XMLSchema::RestrictionType
+   annotation :source => "xsd", :details => {'xmlName' => 'complexRestrictionType'}
 end
 
 class MM::W3Org2001XMLSchema::Element < MM::W3Org2001XMLSchema::Annotated
    abstract
+   annotation :source => "xsd", :details => {'xmlName' => 'element'}
    has_attr 'default', String 
    has_attr 'fixed', String 
    has_attr 'nillable', Boolean 
@@ -211,6 +239,7 @@ class MM::W3Org2001XMLSchema::Element < MM::W3Org2001XMLSchema::Annotated
 end
 
 class MM::W3Org2001XMLSchema::LocalElement < MM::W3Org2001XMLSchema::Element
+   annotation :source => "xsd", :details => {'xmlName' => 'localElement'}
 end
 
 class MM::W3Org2001XMLSchema::AnyTYPE < MM::W3Org2001XMLSchema::Wildcard
@@ -220,9 +249,11 @@ class MM::W3Org2001XMLSchema::AnyTYPE < MM::W3Org2001XMLSchema::Wildcard
 end
 
 class MM::W3Org2001XMLSchema::LocalComplexType < MM::W3Org2001XMLSchema::ComplexType
+   annotation :source => "xsd", :details => {'xmlName' => 'localComplexType'}
 end
 
 class MM::W3Org2001XMLSchema::Keybase < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'keybase'}
    has_attr 'name', String 
    has_attr 'ref', String 
 end
@@ -232,6 +263,7 @@ class MM::W3Org2001XMLSchema::KeyrefTYPE < MM::W3Org2001XMLSchema::Keybase
 end
 
 class MM::W3Org2001XMLSchema::AltType < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'altType'}
    has_attr 'test', String 
    has_attr 'type', String 
    has_attr 'xpathDefaultNamespace', Object 
@@ -248,24 +280,31 @@ class MM::W3Org2001XMLSchema::FieldTYPE < MM::W3Org2001XMLSchema::Annotated
 end
 
 class MM::W3Org2001XMLSchema::TopLevelComplexType < MM::W3Org2001XMLSchema::ComplexType
+   annotation :source => "xsd", :details => {'xmlName' => 'topLevelComplexType'}
 end
 
 class MM::W3Org2001XMLSchema::TopLevelElement < MM::W3Org2001XMLSchema::Element
+   annotation :source => "xsd", :details => {'xmlName' => 'topLevelElement'}
 end
 
 class MM::W3Org2001XMLSchema::NamedGroup < MM::W3Org2001XMLSchema::RealGroup
+   annotation :source => "xsd", :details => {'xmlName' => 'namedGroup'}
 end
 
 class MM::W3Org2001XMLSchema::SimpleExplicitGroup < MM::W3Org2001XMLSchema::ExplicitGroup
+   annotation :source => "xsd", :details => {'xmlName' => 'simpleExplicitGroup'}
 end
 
 class MM::W3Org2001XMLSchema::NamedAttributeGroup < MM::W3Org2001XMLSchema::AttributeGroup
+   annotation :source => "xsd", :details => {'xmlName' => 'namedAttributeGroup'}
 end
 
 class MM::W3Org2001XMLSchema::TopLevelSimpleType < MM::W3Org2001XMLSchema::SimpleType
+   annotation :source => "xsd", :details => {'xmlName' => 'topLevelSimpleType'}
 end
 
 class MM::W3Org2001XMLSchema::IntFacet < MM::W3Org2001XMLSchema::Facet
+   annotation :source => "xsd", :details => {'xmlName' => 'intFacet'}
 end
 
 class MM::W3Org2001XMLSchema::SchemaTYPE < MM::W3Org2001XMLSchema::OpenAttrs

@@ -23,13 +23,32 @@ class XSIInstantiator
     root_class = options[:root_class].andand.ecore || root_class(doc.root.name)
     File.open(file) do |f|
       doc = Nokogiri::XML(f)
-      root =instantiate_node(doc.root, root_class)
       @namespaces = doc.root.namespace_definitions
+      root =instantiate_node(doc.root, root_class)
     end
     root
   end
 
+  def resolve_namespace(str)
+    if str =~ /:/
+      prefix, name = str.split(":")
+    else
+      prefix, name = nil, str
+    end
+    # the default namespace has a prefix of nil
+    href = namespaces.find{|ns| ns.prefix == prefix}.andand.href
+    # built in xml schema namespace
+    if !href && prefix == "xml"
+      href = "http://www.w3.org/XML/1998/namespace" 
+    end
+    [href, name]
+  end
+
   private
+
+  def xsi_type_value(node)
+    node.attribute_nodes.find{|n| is_xsi_type?(n)}.andand.text
+  end
 
   def instantiate_node(node, eclass)
     element = eclass.instanceClass.new
@@ -47,8 +66,12 @@ class XSIInstantiator
         }
         if feats.size == 1
           begin
-            element.setOrAddGeneric(feats.first.name,
-              instantiate_node(c, reference_target_type(feats.first, c.name)))
+            if feats.first.is_a?(RGen::ECore::EReference)
+              element.setOrAddGeneric(feats.first.name,
+                instantiate_node(c, reference_target_type(feats.first, xsi_type_value(c))))
+            else
+              element.setOrAddGeneric(feats.first.name, value_from_string(element, feats.first, c.text))
+            end
           rescue Exception => e
             puts "Line: #{node.line}: #{e}"
           end
@@ -75,14 +98,19 @@ class XSIInstantiator
   def set_simple_content(element, value)
     a = element.class.ecore.eAllAttributes.find{|a| annotation_value(a, "simpleContent") == "true"} 
     if a
-      element.setGeneric(a.name, value)
+      element.setGeneric(a.name, value_from_string(element, a, value))
     else
       raise "could not set simple content for element #{element.class.name}"
     end
   end
 
+  def is_xsi_type?(attr_node)
+    attr_node.namespace.andand.href == "http://www.w3.org/2001/XMLSchema-instance" && attr_node.node_name == "type"
+  end
+
   def set_attribute_values(element, node)
     node.attribute_nodes.each do |attrnode|
+      next if is_xsi_type?(attrnode)
       name = attrnode.node_name
       feats = (features_by_xml_name(name) || []).select{|f| 
         f.eContainingClass == element.class.ecore ||
@@ -130,21 +158,19 @@ class XSIInstantiator
     end
   end
 
-  def reference_target_type(ref, tag)
-    #TODO: xsi:type support
-    if ref.eType.eSubTypes.size > 0
-      p = annotation_value(ref, "xmlName").andand.split(",").andand.find{|p| p.split("=").first == tag}
-      type_name = p && p.split("=")[1]
-      if type_name
-        eclass = @mm.ecore.eAllClasses.find{|c| c.name == type_name}
-        if eclass
-          eclass
-        else
-          raise "could not find class for type name #{type_name}"
-        end
+  def reference_target_type(ref, typename)
+    if typename
+      href, name = resolve_namespace(typename)
+      if !href
+        raise "could not resolve namespace in #{typename}"
+      end
+      types = (ref.eType.eAllSubTypes + [ref.eType]) & classes_by_xml_name(name).select{|c| xml_name(c.ePackage) == href}
+      if types.size == 1
+        types.first
+      elsif types.size > 1
+        raise "ambiguous type name #{typename}: #{types.collect{|t| t.name}.join(",")}"
       else
-        # is this correct? 
-        ref.eType
+        raise "type name #{typename} not found"
       end
     else
       ref.eType

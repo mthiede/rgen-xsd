@@ -22,16 +22,7 @@ class XSDInstantiator
     urefs = inst.unresolved_refs
     urefs.each do |ur|
       ti = ur.proxy.targetIdentifier
-      if ti =~ /:/
-        prefix, name = ti.split(":")
-      else
-        prefix, name = nil, ti
-      end
-      href = inst.namespaces.find{|ns| ns.prefix == prefix}.andand.href
-      # built in xml schema namespace
-      if !href && prefix == "xml"
-        href = "http://www.w3.org/XML/1998/namespace" 
-      end
+      href, name = inst.resolve_namespace(ti)
       if href
         ur.proxy.targetIdentifier = "#{href}:#{name}"
       else

@@ -134,7 +134,7 @@ class XSDToEcoreTransformer < RGen::Transformer
       name = s.targetNamespace.sub(/http:\/\/(www\.)?/,"").split("/").
         collect{|p| p.split(/\W/).collect{|t| firstToUpper(t)}.join }.join
       puts "empty package name" if name.strip.empty?
-      p = package_by_name(name, root)
+      p = package_by_name(name, root, s.targetNamespace)
       child_elements(s).each{|e| @package_by_source_element[e] = p}
     end
     trans(schemas.complexType)
@@ -145,9 +145,10 @@ class XSDToEcoreTransformer < RGen::Transformer
     root
   end
 
-  def package_by_name(name, root)
+  def package_by_name(name, root, ns)
     @package_by_name ||= {}
-    @package_by_name[name] ||= @env_out.new(RGen::ECore::EPackage, :name => name, :eSuperPackage => root)
+    @package_by_name[name] ||= @env_out.new(RGen::ECore::EPackage, :name => name, :eSuperPackage => root,
+      :eAnnotations => [create_annotation("xmlName", ns)])
   end
 
   transform XMLSchemaMetamodel::ComplexType, :to => EClass do
@@ -199,7 +200,8 @@ class XSDToEcoreTransformer < RGen::Transformer
       :eStructuralFeatures => _features,
       :eSuperTypes => trans([complexContent.andand.extension.andand.base || 
         complexContent.andand.restriction.andand.base].compact.select{|t| t.is_a?(XMLSchemaMetamodel::ComplexType)}),
-      :ePackage => @package_by_source_element[@current_object]
+      :ePackage => @package_by_source_element[@current_object],
+      :eAnnotations => name ? [create_annotation("xmlName", name)] : []
     }
   end
 
