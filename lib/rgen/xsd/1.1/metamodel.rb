@@ -318,6 +318,7 @@ MM::W3Org2001XMLSchema::AnnotationTYPE.contains_many_uni 'documentation', MM::W3
 MM::W3Org2001XMLSchema::Attribute.contains_one 'simpleType', MM::W3Org2001XMLSchema::LocalSimpleType, 'containingAttribute' 
 MM::W3Org2001XMLSchema::Attribute.has_one 'ref', MM::W3Org2001XMLSchema::Attribute 
 MM::W3Org2001XMLSchema::Attribute.has_one 'type', MM::W3Org2001XMLSchema::SimpleType 
+MM::W3Org2001XMLSchema::Element.contains_one 'simpleType', MM::W3Org2001XMLSchema::LocalSimpleType, 'containingElement' 
 MM::W3Org2001XMLSchema::SimpleType.contains_one_uni 'restriction', MM::W3Org2001XMLSchema::RestrictionTYPE 
 MM::W3Org2001XMLSchema::SimpleType.contains_one_uni 'list', MM::W3Org2001XMLSchema::ListTYPE 
 MM::W3Org2001XMLSchema::SimpleType.contains_one_uni 'union', MM::W3Org2001XMLSchema::UnionTYPE 
@@ -403,7 +404,6 @@ MM::W3Org2001XMLSchema::RestrictionType.contains_many_uni 'attributeGroup', MM::
 MM::W3Org2001XMLSchema::RestrictionType.contains_one_uni 'anyAttribute', MM::W3Org2001XMLSchema::AnyAttributeTYPE 
 MM::W3Org2001XMLSchema::RestrictionType.contains_many_uni 'assert', MM::W3Org2001XMLSchema::Assertion 
 MM::W3Org2001XMLSchema::RestrictionType.has_one 'base', MM::W3Org2001XMLSchema::Type 
-MM::W3Org2001XMLSchema::Element.contains_one_uni 'simpleType', MM::W3Org2001XMLSchema::LocalSimpleType 
 MM::W3Org2001XMLSchema::Element.contains_one 'complexType', MM::W3Org2001XMLSchema::LocalComplexType, 'containingElement' 
 MM::W3Org2001XMLSchema::Element.contains_many_uni 'unique', MM::W3Org2001XMLSchema::Keybase 
 MM::W3Org2001XMLSchema::Element.contains_many_uni 'key', MM::W3Org2001XMLSchema::Keybase 

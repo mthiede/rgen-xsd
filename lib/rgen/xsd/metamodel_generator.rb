@@ -102,6 +102,7 @@ attribute_to_reference(env_ecore, "UnionTYPE#memberTypes", class_simpleType)
 # bidirectional references
 create_opposite(env_ecore, "Element#substitutionGroup", "substitutes", -1)
 create_opposite(env_ecore, "Element#complexType", "containingElement", 1)
+create_opposite(env_ecore, "Element#simpleType", "containingElement", 1)
 create_opposite(env_ecore, "Attribute#simpleType", "containingAttribute", 1)
 
 include MMGen::MetamodelGenerator

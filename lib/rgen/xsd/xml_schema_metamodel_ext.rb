@@ -9,7 +9,7 @@ module Element::ClassModule
     if e.getType && e.complexType
       puts "WARN: element has both, a type reference and a contained type"
     end
-    e.getType || e.complexType
+    e.getType || e.complexType || e.simpleType
   end
 end
 
