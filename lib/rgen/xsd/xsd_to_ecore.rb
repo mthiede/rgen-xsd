@@ -157,6 +157,18 @@ class XSDToEcoreTransformer < RGen::Transformer
       end
     end
 
+    # unique classifier names
+    # TODO: smarter way to modify names
+    root.eAllSubpackages.each do |p|
+      names = {}
+      p.eClassifiers.each do |c|
+        while names[c.name]
+          c.name = c.name+"X"
+        end
+        names[c.name] = true
+      end
+    end
+
     root
   end
 
