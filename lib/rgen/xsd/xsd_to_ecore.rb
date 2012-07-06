@@ -142,6 +142,21 @@ class XSDToEcoreTransformer < RGen::Transformer
       t.is_a?(XMLSchemaMetamodel::ComplexType) ||
       build_type_desc(t).type.is_a?(Array)
     end)
+
+    # remove duplicate features created by restrictions
+    # TODO: find a way to do this while transformation or make sure unused elements will also be removed (EClasses, EAnnotation, ..)
+    root.eAllClasses.each do |c|
+      super_features = c.eAllStructuralFeatures - c.eStructuralFeatures
+      c.eStructuralFeatures.each do |f|
+        if super_features.any?{|sf| sf.name == f.name}
+          f.eContainingClass = nil
+          f.eType = nil
+          f.eOpposite = nil if f.is_a?(RGen::ECore::EReference)
+          @env_out.delete(f)
+        end
+      end
+    end
+
     root
   end
 
@@ -155,6 +170,8 @@ class XSDToEcoreTransformer < RGen::Transformer
     _features = []
     if complexContent.andand.extension
       _particles = element_particles(complexContent.extension)
+    elsif complexContent.andand.restriction
+      _particles = element_particles(complexContent.restriction)
     else
       _particles = element_particles(@current_object)
     end 

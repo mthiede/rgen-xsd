@@ -89,7 +89,6 @@ class MM::W3Org2001XMLSchema::LocalSimpleType < MM::W3Org2001XMLSchema::SimpleTy
 end
 
 class MM::W3Org2001XMLSchema::RestrictionTYPE < MM::W3Org2001XMLSchema::Annotated
-   has_many_attr 'anyObject', Object 
 end
 
 class MM::W3Org2001XMLSchema::ListTYPE < MM::W3Org2001XMLSchema::Annotated
@@ -201,27 +200,6 @@ class MM::W3Org2001XMLSchema::ComplexContentTYPE < MM::W3Org2001XMLSchema::Annot
    has_attr 'mixed', Boolean 
 end
 
-class MM::W3Org2001XMLSchema::RestrictionType < MM::W3Org2001XMLSchema::Annotated
-   annotation :source => "xsd", :details => {'xmlName' => 'restrictionType'}
-   has_many_attr 'anyObject', Object 
-end
-
-class MM::W3Org2001XMLSchema::SimpleRestrictionType < MM::W3Org2001XMLSchema::RestrictionType
-   annotation :source => "xsd", :details => {'xmlName' => 'simpleRestrictionType'}
-end
-
-class MM::W3Org2001XMLSchema::ExtensionType < MM::W3Org2001XMLSchema::Annotated
-   annotation :source => "xsd", :details => {'xmlName' => 'extensionType'}
-end
-
-class MM::W3Org2001XMLSchema::SimpleExtensionType < MM::W3Org2001XMLSchema::ExtensionType
-   annotation :source => "xsd", :details => {'xmlName' => 'simpleExtensionType'}
-end
-
-class MM::W3Org2001XMLSchema::ComplexRestrictionType < MM::W3Org2001XMLSchema::RestrictionType
-   annotation :source => "xsd", :details => {'xmlName' => 'complexRestrictionType'}
-end
-
 class MM::W3Org2001XMLSchema::Element < MM::W3Org2001XMLSchema::Annotated
    abstract
    annotation :source => "xsd", :details => {'xmlName' => 'element'}
@@ -246,6 +224,29 @@ class MM::W3Org2001XMLSchema::AnyTYPE < MM::W3Org2001XMLSchema::Wildcard
    has_many_attr 'notQName', Object 
    has_attr 'minOccurs', Integer 
    has_attr 'maxOccurs', Object 
+end
+
+class MM::W3Org2001XMLSchema::GroupTYPE < MM::W3Org2001XMLSchema::GroupRef
+end
+
+class MM::W3Org2001XMLSchema::RestrictionType < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'restrictionType'}
+end
+
+class MM::W3Org2001XMLSchema::SimpleRestrictionType < MM::W3Org2001XMLSchema::RestrictionType
+   annotation :source => "xsd", :details => {'xmlName' => 'simpleRestrictionType'}
+end
+
+class MM::W3Org2001XMLSchema::ExtensionType < MM::W3Org2001XMLSchema::Annotated
+   annotation :source => "xsd", :details => {'xmlName' => 'extensionType'}
+end
+
+class MM::W3Org2001XMLSchema::SimpleExtensionType < MM::W3Org2001XMLSchema::ExtensionType
+   annotation :source => "xsd", :details => {'xmlName' => 'simpleExtensionType'}
+end
+
+class MM::W3Org2001XMLSchema::ComplexRestrictionType < MM::W3Org2001XMLSchema::RestrictionType
+   annotation :source => "xsd", :details => {'xmlName' => 'complexRestrictionType'}
 end
 
 class MM::W3Org2001XMLSchema::LocalComplexType < MM::W3Org2001XMLSchema::ComplexType
@@ -289,6 +290,9 @@ end
 
 class MM::W3Org2001XMLSchema::NamedGroup < MM::W3Org2001XMLSchema::RealGroup
    annotation :source => "xsd", :details => {'xmlName' => 'namedGroup'}
+end
+
+class MM::W3Org2001XMLSchema::AllTYPE < MM::W3Org2001XMLSchema::All
 end
 
 class MM::W3Org2001XMLSchema::SimpleExplicitGroup < MM::W3Org2001XMLSchema::ExplicitGroup
@@ -358,9 +362,6 @@ MM::W3Org2001XMLSchema::Attribute.contains_one 'simpleType', MM::W3Org2001XMLSch
 MM::W3Org2001XMLSchema::Attribute.has_one 'ref', MM::W3Org2001XMLSchema::Attribute 
 MM::W3Org2001XMLSchema::Attribute.has_one 'type', MM::W3Org2001XMLSchema::SimpleType 
 MM::W3Org2001XMLSchema::Element.contains_one 'simpleType', MM::W3Org2001XMLSchema::LocalSimpleType, 'containingElement' 
-MM::W3Org2001XMLSchema::SimpleType.contains_one_uni 'restriction', MM::W3Org2001XMLSchema::RestrictionTYPE 
-MM::W3Org2001XMLSchema::SimpleType.contains_one_uni 'list', MM::W3Org2001XMLSchema::ListTYPE 
-MM::W3Org2001XMLSchema::SimpleType.contains_one_uni 'union', MM::W3Org2001XMLSchema::UnionTYPE 
 MM::W3Org2001XMLSchema::RestrictionTYPE.contains_many_uni 'minExclusive', MM::W3Org2001XMLSchema::Facet 
 MM::W3Org2001XMLSchema::RestrictionTYPE.contains_many_uni 'minInclusive', MM::W3Org2001XMLSchema::Facet 
 MM::W3Org2001XMLSchema::RestrictionTYPE.contains_many_uni 'maxExclusive', MM::W3Org2001XMLSchema::Facet 
@@ -381,6 +382,9 @@ MM::W3Org2001XMLSchema::ListTYPE.contains_one_uni 'simpleType', MM::W3Org2001XML
 MM::W3Org2001XMLSchema::ListTYPE.has_one 'itemType', MM::W3Org2001XMLSchema::SimpleType 
 MM::W3Org2001XMLSchema::UnionTYPE.contains_many_uni 'simpleType', MM::W3Org2001XMLSchema::LocalSimpleType 
 MM::W3Org2001XMLSchema::UnionTYPE.has_many 'memberTypes', MM::W3Org2001XMLSchema::SimpleType 
+MM::W3Org2001XMLSchema::SimpleType.contains_one_uni 'restriction', MM::W3Org2001XMLSchema::RestrictionTYPE 
+MM::W3Org2001XMLSchema::SimpleType.contains_one_uni 'list', MM::W3Org2001XMLSchema::ListTYPE 
+MM::W3Org2001XMLSchema::SimpleType.contains_one_uni 'union', MM::W3Org2001XMLSchema::UnionTYPE 
 MM::W3Org2001XMLSchema::ComplexType.contains_one_uni 'group', MM::W3Org2001XMLSchema::GroupRef 
 MM::W3Org2001XMLSchema::ComplexType.contains_one_uni 'all', MM::W3Org2001XMLSchema::All 
 MM::W3Org2001XMLSchema::ComplexType.contains_one_uni 'choice', MM::W3Org2001XMLSchema::ExplicitGroup 
@@ -418,6 +422,18 @@ MM::W3Org2001XMLSchema::ExtensionType.contains_one_uni 'anyAttribute', MM::W3Org
 MM::W3Org2001XMLSchema::ExtensionType.contains_many_uni 'assert', MM::W3Org2001XMLSchema::Assertion 
 MM::W3Org2001XMLSchema::ExtensionType.contains_one_uni 'openContent', MM::W3Org2001XMLSchema::OpenContentTYPE 
 MM::W3Org2001XMLSchema::ExtensionType.has_one 'base', MM::W3Org2001XMLSchema::Type 
+MM::W3Org2001XMLSchema::Element.contains_one 'complexType', MM::W3Org2001XMLSchema::LocalComplexType, 'containingElement' 
+MM::W3Org2001XMLSchema::Keybase.contains_one_uni 'selector', MM::W3Org2001XMLSchema::SelectorTYPE 
+MM::W3Org2001XMLSchema::Keybase.contains_many_uni 'field', MM::W3Org2001XMLSchema::FieldTYPE 
+MM::W3Org2001XMLSchema::AltType.contains_one_uni 'simpleType', MM::W3Org2001XMLSchema::LocalSimpleType 
+MM::W3Org2001XMLSchema::AltType.contains_one_uni 'complexType', MM::W3Org2001XMLSchema::LocalComplexType 
+MM::W3Org2001XMLSchema::Element.contains_many_uni 'unique', MM::W3Org2001XMLSchema::Keybase 
+MM::W3Org2001XMLSchema::Element.contains_many_uni 'key', MM::W3Org2001XMLSchema::Keybase 
+MM::W3Org2001XMLSchema::Element.contains_many_uni 'keyref', MM::W3Org2001XMLSchema::KeyrefTYPE 
+MM::W3Org2001XMLSchema::Element.contains_many_uni 'alternative', MM::W3Org2001XMLSchema::AltType 
+MM::W3Org2001XMLSchema::Element.has_one 'ref', MM::W3Org2001XMLSchema::Element 
+MM::W3Org2001XMLSchema::Element.has_one 'type', MM::W3Org2001XMLSchema::Type 
+MM::W3Org2001XMLSchema::Element.many_to_many 'substitutionGroup', MM::W3Org2001XMLSchema::Element, 'substitutes' 
 MM::W3Org2001XMLSchema::RestrictionType.contains_one_uni 'group', MM::W3Org2001XMLSchema::GroupRef 
 MM::W3Org2001XMLSchema::RestrictionType.contains_one_uni 'all', MM::W3Org2001XMLSchema::All 
 MM::W3Org2001XMLSchema::RestrictionType.contains_one_uni 'choice', MM::W3Org2001XMLSchema::ExplicitGroup 
@@ -443,18 +459,6 @@ MM::W3Org2001XMLSchema::RestrictionType.contains_many_uni 'attributeGroup', MM::
 MM::W3Org2001XMLSchema::RestrictionType.contains_one_uni 'anyAttribute', MM::W3Org2001XMLSchema::AnyAttributeTYPE 
 MM::W3Org2001XMLSchema::RestrictionType.contains_many_uni 'assert', MM::W3Org2001XMLSchema::Assertion 
 MM::W3Org2001XMLSchema::RestrictionType.has_one 'base', MM::W3Org2001XMLSchema::Type 
-MM::W3Org2001XMLSchema::Element.contains_one 'complexType', MM::W3Org2001XMLSchema::LocalComplexType, 'containingElement' 
-MM::W3Org2001XMLSchema::Element.contains_many_uni 'unique', MM::W3Org2001XMLSchema::Keybase 
-MM::W3Org2001XMLSchema::Element.contains_many_uni 'key', MM::W3Org2001XMLSchema::Keybase 
-MM::W3Org2001XMLSchema::Element.contains_many_uni 'keyref', MM::W3Org2001XMLSchema::KeyrefTYPE 
-MM::W3Org2001XMLSchema::Element.contains_many_uni 'alternative', MM::W3Org2001XMLSchema::AltType 
-MM::W3Org2001XMLSchema::Element.has_one 'ref', MM::W3Org2001XMLSchema::Element 
-MM::W3Org2001XMLSchema::Element.has_one 'type', MM::W3Org2001XMLSchema::Type 
-MM::W3Org2001XMLSchema::Element.many_to_many 'substitutionGroup', MM::W3Org2001XMLSchema::Element, 'substitutes' 
-MM::W3Org2001XMLSchema::Keybase.contains_one_uni 'selector', MM::W3Org2001XMLSchema::SelectorTYPE 
-MM::W3Org2001XMLSchema::Keybase.contains_many_uni 'field', MM::W3Org2001XMLSchema::FieldTYPE 
-MM::W3Org2001XMLSchema::AltType.contains_one_uni 'simpleType', MM::W3Org2001XMLSchema::LocalSimpleType 
-MM::W3Org2001XMLSchema::AltType.contains_one_uni 'complexType', MM::W3Org2001XMLSchema::LocalComplexType 
 MM::W3Org2001XMLSchema::SchemaTYPE.contains_one_uni 'defaultOpenContent', MM::W3Org2001XMLSchema::DefaultOpenContentTYPE 
 MM::W3Org2001XMLSchema::SchemaTYPE.contains_many_uni 'annotation', MM::W3Org2001XMLSchema::AnnotationTYPE 
 MM::W3Org2001XMLSchema::SchemaTYPE.contains_many_uni 'simpleType', MM::W3Org2001XMLSchema::TopLevelSimpleType 
