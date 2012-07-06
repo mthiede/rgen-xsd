@@ -24,6 +24,7 @@ def build_type_desc(type)
     # (type.union.memberTypes + type.union.simpleType).each do |t|
     #   build_type_desc(t)
     # end
+    # TODO: make this a string instead? otherwise there is a problem serializing with RText (could also be fixed in RText: o.to_s)
     SimpleType.new(:object, false, 0, 1)
   elsif type.respond_to?(:restriction) && type.restriction
     if type.restriction.base
