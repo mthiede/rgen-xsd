@@ -24,12 +24,17 @@ module XSD
 #
 # 1.2 Restriction is mapped to supertype relationship
 #
-# * the restricting Complex Type does not contribute any features, 
-#   i.e. the resulting subtype does not contain any features
-# * rationale: the restriction expresses a "is a" relationship
+# * the restriction expresses a "is a" relationship
 #   ("it is a <super type> but with restrictions")
-#   the restrictions can not be expressed in ECore
+#   in general, restrictions can not be expressed in ECore, so
 #   we accept to have a superset of the original constraints
+# * in some cases however, the restricting Complex Type many also contribute features
+#   e.g. in case the base complex type has a 'any' wildcard, then the
+#   restricting type may narrow this by specifying specific elements
+# * the implementation idea is to add all features introduced by the restriction, just
+#   in the same way as with the extension, but exclude any features which have
+#   already been defined in a super class (i.e. new features may be added but
+#   existing features can not be restricted)
 #
 # 1.3 Element Particles
 #
