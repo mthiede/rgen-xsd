@@ -1,0 +1,16 @@
+== RGen XSD - XML Schema Support for RGen
+
+RGen XSD is an extension to the RGen Modelling Framework which brings support for XML Schema.
+
+Features include:
+* Reading XML Schema data into an RGen model
+* Transformation of XML Schema data into an ECore metamodel
+* Reading XML instances into an RGen model conforming to the generated ECore metamodel
+* Includes XML Schema metamodels generated from normative schemas
+
+= License
+
+RGen XSD is released under the MIT license.
+
+Included XML Schemas are copyright by the W3C, for details see readme.txt in subfolders.
+
