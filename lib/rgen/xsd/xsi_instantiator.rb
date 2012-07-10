@@ -38,8 +38,12 @@ class XSIInstantiator
     # the default namespace has a prefix of nil
     href = namespaces.find{|ns| ns.prefix == prefix}.andand.href
     # built in xml schema namespace
-    if !href && prefix == "xml"
-      href = "http://www.w3.org/XML/1998/namespace" 
+    if !href 
+      if prefix == "xml"
+        href = "http://www.w3.org/XML/1998/namespace" 
+      elsif prefix
+        puts "WARN: Can not resolve namespace prefix #{prefix}"
+      end
     end
     [href, name]
   end
@@ -128,7 +132,7 @@ class XSIInstantiator
         else
           element.setGeneric(f.name, value_from_string(element, f, str))
         end 
-      elsif name == "schemaLocation"
+      elsif name == "schemaLocation" || name == "noNamespaceSchemaLocation"
         # ignore, this may occure with any XML element
       else
         problem "could not determine feature for attribute #{name}, #{feats.size} options", node

@@ -26,7 +26,7 @@ class XSDInstantiator
       if href
         ur.proxy.targetIdentifier = "#{href}:#{name}"
       else
-        puts "WARN: could not resolve namespace prefix #{prefix} in file #{file_name}"
+        # either namespace not found (warning in resolve_namespace) or no namespace at all (not even default namespace)
       end
     end
     @unresolved_refs += urefs 
@@ -36,7 +36,13 @@ class XSDInstantiator
       schema.simpleType + 
       schema.attribute + 
       schema.attributeGroup).each do |e|
-        @resolver.add_identifier("#{schema.targetNamespace}:#{e.name}", e) if e.name
+        if e.name
+          if schema.targetNamespace
+            @resolver.add_identifier("#{schema.targetNamespace}:#{e.name}", e)
+          else
+            @resolver.add_identifier(e.name, e)
+          end
+        end
     end
   end
 

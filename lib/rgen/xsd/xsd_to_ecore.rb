@@ -136,10 +136,11 @@ class XSDToEcoreTransformer < RGen::Transformer
     root = @env_out.new(RGen::ECore::EPackage, :name => "MM")
     schemas = @env_in.find(:class => XMLSchemaMetamodel::SchemaTYPE)
     schemas.each do |s|
-      name = s.targetNamespace.sub(/http:\/\/(www\.)?/,"").split("/").
+      tns = s.targetNamespace || "Default"
+      name = tns.sub(/http:\/\/(www\.)?/,"").split("/").
         collect{|p| p.split(/\W/).collect{|t| firstToUpper(t)}.join }.join
       puts "empty package name" if name.strip.empty?
-      p = package_by_name(name, root, s.targetNamespace)
+      p = package_by_name(name, root, tns)
       child_elements(s).each{|e| @package_by_source_element[e] = p}
     end
     trans(schemas.complexType)
