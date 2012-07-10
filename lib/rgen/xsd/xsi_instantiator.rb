@@ -165,9 +165,7 @@ class XSIInstantiator
   def reference_target_type(ref, typename)
     if typename
       href, name = resolve_namespace(typename)
-      if !href
-        raise "could not resolve namespace in #{typename}"
-      end
+      href ||= "Default"
       types = (ref.eType.eAllSubTypes + [ref.eType]) & classes_by_xml_name(name).select{|c| xml_name(c.ePackage) == href}
       if types.size == 1
         types.first
