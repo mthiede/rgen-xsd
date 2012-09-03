@@ -61,7 +61,7 @@ class XSIInstantiator
       element = eclass.instanceClass.new
       @env << element
     end
-    set_attribute_values(element, node)
+    set_attribute_values(element, node, wrapper_features)
     simple_content = ""
     node.children.each do |c|
       if c.text?
@@ -131,11 +131,15 @@ class XSIInstantiator
     attr_node.namespace.andand.href == "http://www.w3.org/2001/XMLSchema-instance" && attr_node.node_name == "type"
   end
 
-  def set_attribute_values(element, node)
+  def set_attribute_values(element, node, wrapper_features)
     node.attribute_nodes.each do |attrnode|
       next if is_xsi_type?(attrnode)
       name = attrnode.node_name
-      feats = features_by_xml_name(element.class, name) || []
+      if wrapper_features
+        feats = wrapper_features.select{|f| xml_name(f) == name}
+      else
+        feats = features_by_xml_name(element.class, name) || []
+      end
       if feats.size == 1
         f = feats.first
         str = node.attr(name)
