@@ -19,6 +19,8 @@ class XSIInstantiator
 
   def instantiate(file, options={})
     @unresolved_refs = []
+    @target_identifier_provider = options[:target_identifier_provider] ||
+      lambda do |node| node["id"] end
     root = nil
     root_class = options[:root_class].andand.ecore || root_class(doc.root.name)
     File.open(file) do |f|
@@ -54,9 +56,11 @@ class XSIInstantiator
     node.attribute_nodes.find{|n| is_xsi_type?(n)}.andand.text
   end
 
-  def instantiate_node(node, eclass)
-    element = eclass.instanceClass.new
-    @env << element
+  def instantiate_node(node, eclass, element=nil, wrapper_features=nil)
+    if !element
+      element = eclass.instanceClass.new
+      @env << element
+    end
     set_attribute_values(element, node)
     simple_content = ""
     can_take_any = eclass.eAllAttributes.any?{|a| a.name == "anyObject"}
@@ -64,28 +68,50 @@ class XSIInstantiator
       if c.text?
         simple_content << c.text
       elsif c.element?
-        feats = features_by_xml_name(c.name).select{|f| 
-          f.eContainingClass == element.class.ecore ||
-          f.eContainingClass.eAllSubTypes.include?(element.class.ecore)
-        }
+        if wrapper_features
+          feats = wrapper_features.select{|f| xml_name(f) == c.name}
+        else
+          feats = features_by_xml_name(c.name).select{|f| 
+            f.eContainingClass == element.class.ecore ||
+            f.eContainingClass.eAllSubTypes.include?(element.class.ecore)
+          }
+        end
         if feats.size == 1
           begin
             if feats.first.is_a?(RGen::ECore::EReference)
-              element.setOrAddGeneric(feats.first.name,
-                instantiate_node(c, reference_target_type(feats.first, xsi_type_value(c))))
+              if feats.first.containment
+                element.setOrAddGeneric(feats.first.name,
+                  instantiate_node(c, reference_target_type(feats.first, xsi_type_value(c))))
+              else
+                proxy = RGen::MetamodelBuilder::MMProxy.new(@target_identifier_provider.call(c))
+                @unresolved_refs <<
+                  RGen::Instantiator::ReferenceResolver::UnresolvedReference.new(element, feats.first.name, proxy)
+                element.setOrAddGeneric(feats.first.name, proxy)
+              end
             else
               element.setOrAddGeneric(feats.first.name, value_from_string(element, feats.first, c.text))
             end
           rescue Exception => e
-            puts "Line: #{node.line}: #{e}"
+            puts "Line: #{node.line}: #{e}\n#{e.backtrace.join("\n")}"
           end
         else
-          if can_take_any
+          if wrapper_features
+            # already inside a wrapper
+            wrapper_feats = []
+          else
+            wrapper_feats = (features_by_xml_wrapper_name(c.name) || []).select{|f| 
+              f.eContainingClass == element.class.ecore ||
+              f.eContainingClass.eAllSubTypes.include?(element.class.ecore)
+            }
+          end
+          if wrapper_feats.size > 0
+            instantiate_node(c, eclass, element, wrapper_feats)
+          elsif can_take_any
             begin
               # currently the XML node is added to the model
               element.setOrAddGeneric("anyObject", c)
             rescue Exception => e
-              puts "Line: #{node.line}: #{e}"
+              puts "Line: #{node.line}: #{e}\n#{e.backtrace.join("\n")}"
             end
           else
             problem "could not determine reference for tag #{c.name}, #{feats.size} options", node
@@ -142,18 +168,20 @@ class XSIInstantiator
 
   def value_from_string(element, f, str)
     if f.is_a?(RGen::ECore::EAttribute)
-      case f.eType
-      when RGen::ECore::EInt
-        str.to_i
-      when RGen::ECore::EFloat
-        str.to_f
-      when RGen::ECore::EEnum
+      if f.eType.is_a?(RGen::ECore::EEnum)
         str.to_sym
-      when RGen::ECore::EBoolean
-        (str == "true")
       else
-        str
-      end 
+        case f.eType.instanceClassName
+        when "Integer"
+          str.to_i
+        when "Float"
+          str.to_f
+        when "Boolean"
+          (str == "true")
+        else
+          str
+        end 
+      end
     else
       proxy = RGen::MetamodelBuilder::MMProxy.new(str)
       @unresolved_refs <<
@@ -214,8 +242,25 @@ class XSIInstantiator
     @features_by_xml_name[name]
   end
 
+  def features_by_xml_wrapper_name(name)
+    return @features_by_xml_wrapper_name[name] || [] if @features_by_xml_wrapper_name
+    @features_by_xml_wrapper_name = {}
+    @mm.ecore.eAllClasses.eStructuralFeatures.each do |f|
+      n = xml_wrapper_name(f)
+      if n
+        @features_by_xml_wrapper_name[n] ||= []
+        @features_by_xml_wrapper_name[n] << f
+      end
+    end
+    @features_by_xml_wrapper_name[name]
+  end
+
   def xml_name(o)
     annotation_value(o, "xmlName") || o.name
+  end
+
+  def xml_wrapper_name(o)
+    annotation_value(o, "xmlWrapperName")
   end
 
   def annotation_value(o, key)
