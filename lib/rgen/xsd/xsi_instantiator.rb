@@ -63,7 +63,6 @@ class XSIInstantiator
     end
     set_attribute_values(element, node)
     simple_content = ""
-    can_take_any = eclass.eAllAttributes.any?{|a| a.name == "anyObject"}
     node.children.each do |c|
       if c.text?
         simple_content << c.text
@@ -71,10 +70,7 @@ class XSIInstantiator
         if wrapper_features
           feats = wrapper_features.select{|f| xml_name(f) == c.name}
         else
-          feats = features_by_xml_name(c.name).select{|f| 
-            f.eContainingClass == element.class.ecore ||
-            f.eContainingClass.eAllSubTypes.include?(element.class.ecore)
-          }
+          feats = features_by_xml_name(element.class, c.name) || []
         end
         if feats.size == 1
           begin
@@ -99,14 +95,11 @@ class XSIInstantiator
             # already inside a wrapper
             wrapper_feats = []
           else
-            wrapper_feats = (features_by_xml_wrapper_name(c.name) || []).select{|f| 
-              f.eContainingClass == element.class.ecore ||
-              f.eContainingClass.eAllSubTypes.include?(element.class.ecore)
-            }
+            wrapper_feats = features_by_xml_wrapper_name(element.class, c.name) || []
           end
           if wrapper_feats.size > 0
             instantiate_node(c, eclass, element, wrapper_feats)
-          elsif can_take_any
+          elsif can_take_any(eclass)
             begin
               # currently the XML node is added to the model
               element.setOrAddGeneric("anyObject", c)
@@ -142,9 +135,7 @@ class XSIInstantiator
     node.attribute_nodes.each do |attrnode|
       next if is_xsi_type?(attrnode)
       name = attrnode.node_name
-      feats = (features_by_xml_name(name) || []).select{|f| 
-        f.eContainingClass == element.class.ecore ||
-        f.eContainingClass.eAllSubTypes.include?(element.class.ecore)}
+      feats = features_by_xml_name(element.class, name) || []
       if feats.size == 1
         f = feats.first
         str = node.attr(name)
@@ -231,28 +222,35 @@ class XSIInstantiator
     @classes_by_xml_name[name]
   end
 
-  def features_by_xml_name(name)
-    return @features_by_xml_name[name] || [] if @features_by_xml_name
-    @features_by_xml_name = {}
-    @mm.ecore.eAllClasses.eStructuralFeatures.each do |f|
+  def features_by_xml_name(clazz, name)
+    @features_by_xml_name ||= {}
+    return @features_by_xml_name[clazz][name] || [] if @features_by_xml_name[clazz]
+    @features_by_xml_name[clazz] = {}
+    clazz.ecore.eAllStructuralFeatures.each do |f|
       n = xml_name(f)
-      @features_by_xml_name[n] ||= []
-      @features_by_xml_name[n] << f
+      @features_by_xml_name[clazz][n] ||= []
+      @features_by_xml_name[clazz][n] << f
     end
-    @features_by_xml_name[name]
+    @features_by_xml_name[clazz][name]
   end
 
-  def features_by_xml_wrapper_name(name)
-    return @features_by_xml_wrapper_name[name] || [] if @features_by_xml_wrapper_name
-    @features_by_xml_wrapper_name = {}
-    @mm.ecore.eAllClasses.eStructuralFeatures.each do |f|
+  def features_by_xml_wrapper_name(clazz, name)
+    @features_by_xml_wrapper_name ||= {}
+    return @features_by_xml_wrapper_name[clazz][name] || [] if @features_by_xml_wrapper_name[clazz]
+    @features_by_xml_wrapper_name[clazz] = {}
+    clazz.ecore.eAllStructuralFeatures.each do |f|
       n = xml_wrapper_name(f)
       if n
-        @features_by_xml_wrapper_name[n] ||= []
-        @features_by_xml_wrapper_name[n] << f
+        @features_by_xml_wrapper_name[clazz][n] ||= []
+        @features_by_xml_wrapper_name[clazz][n] << f
       end
     end
-    @features_by_xml_wrapper_name[name]
+    @features_by_xml_wrapper_name[clazz][name]
+  end
+
+  def can_take_any(eclass)
+    @can_take_any ||= {}
+    @can_take_any[eclass] ||= eclass.eAllAttributes.any?{|a| a.name == "anyObject"}
   end
 
   def xml_name(o)
