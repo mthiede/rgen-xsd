@@ -6,7 +6,7 @@ DocFiles = [
 
 RTextGemSpec = Gem::Specification.new do |s|
   s.name = %q{rgen-xsd}
-  s.version = "0.1.0"
+  s.version = "0.2.0"
   s.date = Time.now.strftime("%Y-%m-%d")
   s.summary = %q{RGen XML schema support}
   s.email = %q{martin dot thiede at gmx de}

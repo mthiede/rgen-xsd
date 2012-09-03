@@ -2,3 +2,8 @@
 
 * First public release
 
+=0.2.0
+
+* Made XSI instantiator support XML patterns (wrapper, reference, attribute)
+* Made XSI instantiator a lot faster
+
