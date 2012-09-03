@@ -17,8 +17,14 @@ class XSIInstantiator
     @namespaces = []
   end
 
+  # options:
+  #  :unresolved_refs: an array to which unresolved references will be appended
+  #  :problems: an array to which problems during instantiation will be appended
+  #  :fragment_ref: a fragment ref object which will be set on every model element created
   def instantiate(file, options={})
-    @unresolved_refs = []
+    @unresolved_refs = options[:unresolved_refs] || []
+    @fragment_ref = options[:fragment_ref]
+    @problems = options[:problems]
     @target_identifier_provider = options[:target_identifier_provider] ||
       lambda do |node| node["id"] end
     root = nil
@@ -44,7 +50,7 @@ class XSIInstantiator
       if prefix == "xml"
         href = "http://www.w3.org/XML/1998/namespace" 
       elsif prefix
-        puts "WARN: Can not resolve namespace prefix #{prefix}"
+        report_problem "WARN: Can not resolve namespace prefix #{prefix}"
       end
     end
     [href, name]
@@ -59,6 +65,7 @@ class XSIInstantiator
   def instantiate_node(node, eclass, element=nil, wrapper_features=nil)
     if !element
       element = eclass.instanceClass.new
+      element.fragment_ref = @fragment_ref if @fragment_ref
       @env << element
     end
     set_attribute_values(element, node, wrapper_features)
@@ -88,7 +95,7 @@ class XSIInstantiator
               element.setOrAddGeneric(feats.first.name, value_from_string(element, feats.first, c.text))
             end
           rescue Exception => e
-            puts "Line: #{node.line}: #{e}\n#{e.backtrace.join("\n")}"
+            report_problem "#{e}\n#{e.backtrace.join("\n")}", node
           end
         else
           if wrapper_features
@@ -101,13 +108,13 @@ class XSIInstantiator
             instantiate_node(c, eclass, element, wrapper_feats)
           elsif can_take_any(eclass)
             begin
-              # currently the XML node is added to the model
-              element.setOrAddGeneric("anyObject", c)
+              # TODO: currently the XML node is added to the model
+              # element.setOrAddGeneric("anyObject", c)
             rescue Exception => e
-              puts "Line: #{node.line}: #{e}\n#{e.backtrace.join("\n")}"
+              report_problem "#{e}\n#{e.backtrace.join("\n")}", node
             end
           else
-            problem "could not determine reference for tag #{c.name}, #{feats.size} options", node
+            report_problem "could not determine reference for tag #{c.name}, #{feats.size} options", node
           end
         end
       end
@@ -156,7 +163,7 @@ class XSIInstantiator
       elsif name == "schemaLocation" || name == "noNamespaceSchemaLocation"
         # ignore, this may occure with any XML element
       else
-        problem "could not determine feature for attribute #{name}, #{feats.size} options", node
+        report_problem "could not determine feature for attribute #{name}, #{feats.size} options", node
       end
     end
   end
@@ -211,8 +218,12 @@ class XSIInstantiator
     end
   end
 
-  def problem(desc, node)
-    raise desc + " at [#{node.name}]"
+  def report_problem(desc, node=nil)
+    if node
+      @problems << "#{desc} at line #{node.line}"
+    else
+      @problems << desc
+    end
   end
 
   def classes_by_xml_name(name)
