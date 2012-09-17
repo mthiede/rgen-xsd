@@ -6,4 +6,5 @@
 
 * Made XSI instantiator support XML patterns (wrapper, reference, attribute)
 * Made XSI instantiator a lot faster
+* XSI instantiator options to output problems and unresolved refs and set fragment refs
 

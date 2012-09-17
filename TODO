@@ -1,4 +1,3 @@
 * add serializer
 * collisions between attributes from elements and attributes from xml attributes with the same name (e.g. ID in fibex)
-* simplify common reference patterns (..RefsType/..RefType->target into ->target)
 
