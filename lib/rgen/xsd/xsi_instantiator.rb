@@ -149,7 +149,7 @@ class XSIInstantiator
       end
       if feats.size == 1
         f = feats.first
-        str = node.attr(name)
+        str = attrnode.value
         if f.many
           # list datatype implies whitespace handling method "collapse", 
           # removing white space in the front and back and reducing multiple whitespaces to one

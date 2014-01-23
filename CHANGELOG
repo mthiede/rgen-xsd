@@ -8,3 +8,6 @@
 * Made XSI instantiator a lot faster
 * XSI instantiator options to output problems and unresolved refs and set fragment refs
 
+=0.2.1
+
+* Fixed exception in XSI instantiator when reading attributes with namespace
