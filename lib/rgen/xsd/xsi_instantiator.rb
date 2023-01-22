@@ -49,6 +49,8 @@ class XSIInstantiator
     if !href 
       if prefix == "xml"
         href = "http://www.w3.org/XML/1998/namespace" 
+      elsif prefix == "html"
+        href = "http://www.w3.org/1999/xhtml"
       elsif prefix
         report_problem "WARN: Can not resolve namespace prefix #{prefix}"
       end
